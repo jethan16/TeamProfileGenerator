@@ -10,8 +10,7 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
-const answersArr = []
-
+// const answersArr = []
 
 function init() {
 
@@ -29,6 +28,7 @@ function init() {
     ]).then(results => {
 
         if (results.profileType === 'Engineer') {
+
             inquirer.prompt([
                 {
                     type: 'input',
@@ -95,11 +95,13 @@ function init() {
 
             })
         }
+        
+        
     });
 }
 
 function makeList(answers) {
-
+ 
     // answersArr.push(answers)
 
     if (answers.restart === 'yes') {
@@ -108,16 +110,19 @@ function makeList(answers) {
     } else {
         console.log('answers in app.js', answers);
     }
-    
-    module.exports = answers
+        
+    module.exports = answers;
 
-    // render(answersArr)
+    render(answers)
 
-    // module.exports = answers;
 }
+
 
 init()
 
+fs.mkdir('/tmp/a/apple', { recursive: true }, (err) => {
+    if (err) throw err;
+  });
 
 
 
