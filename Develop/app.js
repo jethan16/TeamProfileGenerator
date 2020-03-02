@@ -10,7 +10,7 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
-// const answersArr = []
+const teamArr = []
 
 function init() {
 
@@ -19,6 +19,7 @@ function init() {
             type: "list",
             message: "which type of team member would you like to add?",
             choices: [
+                'Manager',
                 'Engineer',
                 'Intern'
             ],
@@ -26,8 +27,41 @@ function init() {
             default: 'Engineer'
         }
     ]).then(results => {
+        if (results.profileType === 'Manager') {
+            inquirer.prompt([
+                {
+                    type: 'input',
+                    message: `What is you manager's name?`,
+                    name: 'name'
+                },
+                {
+                    type: 'input',
+                    message: `What is your manager's id?`,
+                    name: 'id'
+                },
+                {
+                    type: 'input',
+                    message: `What is your manager's email?`,
+                    name: 'email'
+                },
+                {
+                    type: 'input',
+                    message: `What is your manager's office number?`,
+                    name: 'officeNumber'
+                },
+                {
+                    type: 'list',
+                    message: `Would you like to add another team member?`,
+                    choices: ['yes', 'no'],
+                    name: 'restart'
+                },
+            ]).then(results => {
 
-        if (results.profileType === 'Engineer') {
+                const manager = new Manager(results.name, results.id, results.email, results.officeNumber)
+                makeTeam(results, manager)
+
+            })
+        } else if (results.profileType === 'Engineer') {
 
             inquirer.prompt([
                 {
@@ -58,10 +92,11 @@ function init() {
                 },
             ]).then(results => {
 
-                makeList(results)
+                const engineer = new Engineer(results.name, results.id, results.email, results.github)
+                makeTeam(results, engineer)
 
             })
-        } else {
+        } else if (results.profileType === 'Intern') {
             inquirer.prompt([
                 {
                     type: 'input',
@@ -81,7 +116,7 @@ function init() {
                 {
                     type: 'input',
                     message: `Where did/does your intern attend school?`,
-                    name: 'school ',
+                    name: 'school',
                 },
                 {
                     type: 'list',
@@ -91,38 +126,47 @@ function init() {
                 },
             ]).then(results => {
 
-                makeList(results)
+                const intern = new Intern(results.name, results.id, results.email, results.school)
+                makeTeam(results, intern)
 
             })
         }
-        
-        
+
+
     });
 }
 
-function makeList(answers) {
- 
-    // answersArr.push(answers)
+function makeTeam(answers, member) {
+
+    teamArr.push(member)
 
     if (answers.restart === 'yes') {
-        console.log('answers in app.js', answers);
-        init()
-    } else {
-        console.log('answers in app.js', answers);
-    }
-        
-    module.exports = answers;
 
-    render(answers)
+        init()
+
+    } else {
+
+        writeTeam(teamArr)
+
+    }
 
 }
 
+function writeTeam (teamArr) {
+
+    fs.mkdir(OUTPUT_DIR, () => {})
+
+    fs.writeFile(outputPath, render(teamArr), function (err) {
+
+        if (err) {
+            return console.log(err);
+        }
+
+    })
+
+}
 
 init()
-
-fs.mkdir('/tmp/a/apple', { recursive: true }, (err) => {
-    if (err) throw err;
-  });
 
 
 
@@ -176,4 +220,4 @@ fs.mkdir('/tmp/a/apple', { recursive: true }, (err) => {
 // and Intern classes should all extend from a class named Employee; see the directions
 // for further information. Be sure to test out each class and verify it generates an 
 // object with the correct structure and methods. This structure will be crucial in order
-// for the provided `render` function to work!```
+// for the provided `render` function to work!``
